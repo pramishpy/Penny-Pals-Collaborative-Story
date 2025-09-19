@@ -4,4 +4,6 @@ It was a dark and stormy night. The rain pattered against the window, but a lone
 
 [Chapter 1: The Adventure Begins](./chapter_1.py)
 
+[Chapter 2: Merge Conflict](./chapter2.py)
+
 [Chapter 4: A Successful Collaboration](./chapter_4.py)
