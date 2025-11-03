@@ -1,7 +1,7 @@
 # Backend API
 
-Flask-based API for the expense splitting application.
-
+Flask-based API for PennyPals.
+Here are the endpoints to interact with the backend services.
 ## Endpoints
 
 ### Dashboard
