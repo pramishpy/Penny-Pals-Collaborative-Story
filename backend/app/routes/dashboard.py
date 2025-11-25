@@ -37,15 +37,24 @@ def get_dashboard():
         user_groups = user.groups
         
         for idx, group in enumerate(user_groups):
-            group_expenses = Expense.query.filter_by(group_id=group.id).all()
-            group_amount = sum(exp.amount for exp in group_expenses) / len(group_expenses) if group_expenses else 0
+            # Get user's total splits in this group (per-user amount, not total expense)
+            user_splits = ExpenseSplit.query.filter(
+                ExpenseSplit.user_id == user.id,
+                Expense.group_id == group.id
+            ).join(Expense).all()
+            
+            group_amount = sum(split.amount for split in user_splits)
             total_owed += group_amount
             
             groups_summary.append({
                 'id': group.id,
                 'name': group.name,
                 'amount': f'${group_amount:.2f}',
-                'color': gradients[idx % len(gradients)]
+                'color': gradients[idx % len(gradients)],
+                'members': [
+                    {'id': m.id, 'username': m.username, 'name': m.name}
+                    for m in group.members
+                ]
             })
         
         return {

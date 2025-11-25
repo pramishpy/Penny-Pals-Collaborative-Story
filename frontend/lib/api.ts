@@ -113,6 +113,15 @@ export const api = {
     }
   },
 
+  addMembersToGroup: async (groupId: string, memberIds: string[]) => {
+    try {
+      const response = await apiClient.post(`/groups/${groupId}/members`, { member_ids: memberIds });
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+
   // Transaction endpoints
   getTransactions: async () => {
     try {
