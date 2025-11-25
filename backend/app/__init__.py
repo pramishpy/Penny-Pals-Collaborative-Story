@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from app.models import db
+from app.routes.auth import auth_bp
 from app.routes.dashboard import dashboard_bp
 from app.routes.expenses import expenses_bp
 from app.routes.groups import groups_bp
@@ -12,12 +13,14 @@ def create_app(config_name='development'):
     # Configuration
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///penny_pals.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SECRET_KEY'] = 'your-secret-key-change-in-production'
     
     # Initialize extensions
     db.init_app(app)
-    CORS(app)
+    CORS(app, supports_credentials=True)
     
     # Register blueprints
+    app.register_blueprint(auth_bp, url_prefix='/api')
     app.register_blueprint(dashboard_bp, url_prefix='/api')
     app.register_blueprint(expenses_bp, url_prefix='/api')
     app.register_blueprint(groups_bp, url_prefix='/api')
@@ -49,22 +52,30 @@ def init_db():
     if User.query.first():
         return
     
-    # Create sample users
+    # Create sample users with passwords
     user1 = User(
         id=generate_id(),
+        username='john',
         name='John Doe',
         email='john@example.com'
     )
+    user1.set_password('password123')
+    
     user2 = User(
         id=generate_id(),
+        username='alex',
         name='Alex Smith',
         email='alex@example.com'
     )
+    user2.set_password('password123')
+    
     user3 = User(
         id=generate_id(),
+        username='sam',
         name='Sam Johnson',
         email='sam@example.com'
     )
+    user3.set_password('password123')
     
     db.session.add_all([user1, user2, user3])
     db.session.commit()

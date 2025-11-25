@@ -1,16 +1,23 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from app.models import db, Group, User, group_members
 from app.utils.helpers import generate_id, serialize_model, handle_error
 
 groups_bp = Blueprint('groups', __name__)
 
+def get_current_user():
+    """Get current logged-in user from session"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return None
+    return User.query.get(user_id)
+
 @groups_bp.route('/groups', methods=['GET'])
 def get_groups():
     """Get all groups for current user"""
     try:
-        user = User.query.first()
+        user = get_current_user()
         if not user:
-            return {'groups': [], 'balance': '$0.00'}, 200
+            return {'error': 'Not authenticated'}, 401
         
         groups = user.groups
         
@@ -50,14 +57,14 @@ def get_groups():
 def add_group():
     """Create new group"""
     try:
+        user = get_current_user()
+        if not user:
+            return {'error': 'Not authenticated'}, 401
+        
         data = request.json
         
         if 'name' not in data:
             return handle_error('Group name is required')
-        
-        user = User.query.first()
-        if not user:
-            return handle_error('User not found', 404)
         
         group_id = generate_id()
         group = Group(

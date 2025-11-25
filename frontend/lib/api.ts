@@ -7,6 +7,7 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,
 });
 
 // Error handler wrapper
@@ -18,6 +19,52 @@ const handleError = (error: any) => {
 };
 
 export const api = {
+  // Auth endpoints
+  register: async (userData: any) => {
+    try {
+      const response = await apiClient.post('/auth/register', userData);
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+
+  login: async (credentials: any) => {
+    try {
+      const response = await apiClient.post('/auth/login', credentials);
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+
+  logout: async () => {
+    try {
+      const response = await apiClient.post('/auth/logout');
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+
+  getCurrentUser: async () => {
+    try {
+      const response = await apiClient.get('/auth/current-user');
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+
+  getAllUsers: async () => {
+    try {
+      const response = await apiClient.get('/auth/users');
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+
   // Dashboard endpoints
   getDashboard: async () => {
     try {

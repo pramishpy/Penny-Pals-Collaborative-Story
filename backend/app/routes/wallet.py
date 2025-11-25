@@ -1,16 +1,23 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from app.models import db, Wallet, User
 from app.utils.helpers import generate_id, serialize_model, handle_error
 
 wallet_bp = Blueprint('wallet', __name__)
 
+def get_current_user():
+    """Get current logged-in user from session"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return None
+    return User.query.get(user_id)
+
 @wallet_bp.route('/wallet', methods=['GET'])
 def get_wallet():
     """Get wallet information"""
     try:
-        user = User.query.first()
+        user = get_current_user()
         if not user:
-            return {'balance': '$0.00', 'card_last_four': '0000'}, 200
+            return {'error': 'Not authenticated'}, 401
         
         wallet = Wallet.query.filter_by(user_id=user.id).first()
         if not wallet:
@@ -28,14 +35,14 @@ def get_wallet():
 def load_balance():
     """Load balance to wallet"""
     try:
+        user = get_current_user()
+        if not user:
+            return {'error': 'Not authenticated'}, 401
+        
         data = request.json
         
         if 'amount' not in data:
             return handle_error('Amount is required')
-        
-        user = User.query.first()
-        if not user:
-            return handle_error('User not found', 404)
         
         amount = float(data['amount'])
         if amount <= 0:

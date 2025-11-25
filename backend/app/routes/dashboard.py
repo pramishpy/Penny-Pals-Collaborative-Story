@@ -1,17 +1,23 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from app.models import db, User, Group, Expense, ExpenseSplit, Wallet
 from app.utils.helpers import generate_id, serialize_model, handle_error
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
+def get_current_user():
+    """Get current logged-in user from session"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return None
+    return User.query.get(user_id)
+
 @dashboard_bp.route('/dashboard', methods=['GET'])
 def get_dashboard():
     """Get dashboard summary for current user"""
     try:
-        # For demo, using first user. In real app, get from session/auth
-        user = User.query.first()
+        user = get_current_user()
         if not user:
-            return {'balance': '$0.00', 'groups': [], 'owed': 0}, 200
+            return {'error': 'Not authenticated'}, 401
         
         # Calculate total balance
         total_owed = 0
@@ -43,6 +49,7 @@ def get_dashboard():
             })
         
         return {
+            'user': user.username,
             'balance': f'${total_owed:.2f}',
             'groups': groups_summary,
             'owed': total_owed

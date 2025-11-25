@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { api } from '../lib/api';
 
 interface HeaderProps {
   title: string;
@@ -7,6 +9,31 @@ interface HeaderProps {
 
 export default function Header({ title, logo }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
+
+  const fetchCurrentUser = async () => {
+    try {
+      const response = await api.getCurrentUser();
+      setCurrentUser(response.user);
+    } catch (error) {
+      console.error('Failed to fetch current user');
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await api.logout();
+      setIsMenuOpen(false);
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout failed');
+    }
+  };
 
   return (
     <header className="w-full border-b border-gray-200">
@@ -35,9 +62,10 @@ export default function Header({ title, logo }: HeaderProps) {
           </a>
           <div className="relative">
             <button 
-              className="p-2 hover:bg-gray-100 rounded-lg transition"
+              className="p-2 hover:bg-gray-100 rounded-lg transition flex items-center gap-2"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
+              <span className="text-sm font-medium">{currentUser?.username || 'User'}</span>
               <span className="text-2xl">☰</span>
             </button>
             
@@ -48,28 +76,28 @@ export default function Header({ title, logo }: HeaderProps) {
                   onClick={() => setIsMenuOpen(false)}
                 />
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
+                  <div className="px-4 py-2 border-b border-gray-200 text-sm text-gray-700">
+                    <p className="font-semibold">{currentUser?.name}</p>
+                    <p className="text-xs text-gray-500">{currentUser?.email}</p>
+                  </div>
                   <a 
                     href="/settings" 
-                    className="block px-4 py-2 hover:bg-gray-100 transition"
+                    className="block px-4 py-2 hover:bg-gray-100 transition text-sm"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Settings
                   </a>
                   <a 
                     href="/account" 
-                    className="block px-4 py-2 hover:bg-gray-100 transition"
+                    className="block px-4 py-2 hover:bg-gray-100 transition text-sm"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     My Account
                   </a>
                   <hr className="my-2 border-gray-200" />
                   <button 
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100 transition text-red-600"
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      
-                      window.location.href = '/logout';
-                    }}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 transition text-red-600 text-sm font-medium"
+                    onClick={handleLogout}
                   >
                     Log Out
                   </button>

@@ -15,12 +15,24 @@ class User(db.Model):
     __table_args__ = {'extend_existing': True}
     
     id = db.Column(db.String(36), primary_key=True)
-    name = db.Column(db.String(120), nullable=False)
+    username = db.Column(db.String(120), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(120), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     expenses = db.relationship('Expense', backref='user', lazy=True)
     groups = db.relationship('Group', secondary=group_members, backref='members')
+    
+    def set_password(self, password):
+        """Hash and set password"""
+        from werkzeug.security import generate_password_hash
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        """Check if provided password matches hash"""
+        from werkzeug.security import check_password_hash
+        return check_password_hash(self.password_hash, password)
 
 class Group(db.Model):
     __tablename__ = 'groups'
