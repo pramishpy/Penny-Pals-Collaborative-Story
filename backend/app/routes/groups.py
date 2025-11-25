@@ -17,7 +17,17 @@ def get_groups():
         groups_list = []
         total_balance = 0
         
-        for group in groups:
+        # Define gradient colors for groups
+        gradients = [
+            'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+            'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+            'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+        ]
+        
+        for idx, group in enumerate(groups):
             expenses = group.expenses
             group_amount = sum(exp.amount for exp in expenses) / len(expenses) if expenses else 0
             total_balance += group_amount
@@ -26,7 +36,7 @@ def get_groups():
                 'id': group.id,
                 'name': group.name,
                 'amount': f'${group_amount:.2f}',
-                'color': f'hsl({hash(group.id) % 360}, 70%, 60%)'
+                'color': gradients[idx % len(gradients)]
             })
         
         return {
