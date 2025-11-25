@@ -2,10 +2,8 @@
 
 ## Quick Start
 
-### Test Users (Pre-seeded in database)
-- **john** / password123
-- **alex** / password123  
-- **sam** / password123
+### Database
+Database starts empty - **no pre-seeded users**. You must register users yourself.
 
 ### Running the Application
 
@@ -24,6 +22,8 @@ npm install
 npm run dev
 ```
 Runs on: http://localhost:3000
+
+Then open http://localhost:3000 and register accounts to get started.
 
 ## Features Implemented
 
@@ -58,31 +58,39 @@ Open two browser windows/tabs:
 - `GET /api/auth/users` - Get all users
 
 ### Protected Endpoints
-- `GET /api/dashboard` - User dashboard
-- `GET /api/expenses` - User's expenses
-- `POST /api/expenses` - Add expense
-- `GET /api/groups` - User's groups
-- `POST /api/groups` - Create group
-- `GET /api/wallet` - Wallet balance
+- `GET /api/dashboard` - User dashboard with groups and amounts
+- `GET /api/expenses` - User's expenses from their groups
+- `POST /api/expenses` - Add expense (auto-splits equally)
+- `GET /api/groups` - User's groups with members
+- `POST /api/groups` - Create group (user auto-added)
+- `POST /api/groups/<id>/members` - Add members to group
+- `GET /api/wallet` - Wallet balance and stats
 - `POST /api/wallet/load` - Add funds
+- `GET /api/transactions` - Alias for expenses
 
 ## File Structure Changes
 
 ### Backend
-- `app/models/__init__.py` - Updated User model (added username, password_hash)
-- `app/routes/auth.py` - NEW authentication routes
-- `app/routes/dashboard.py` - Updated to use current user
-- `app/routes/expenses.py` - Updated to use current user
-- `app/routes/groups.py` - Updated to use current user
-- `app/routes/wallet.py` - Updated to use current user
-- `backend/requirements.txt` - Added Werkzeug
+- `app/models/__init__.py` - User model with username, password_hash
+- `app/routes/auth.py` - Register, login, logout, get-current-user, get-all-users
+- `app/routes/dashboard.py` - Groups with amounts and members
+- `app/routes/expenses.py` - Expenses with splitting and group filtering
+- `app/routes/groups.py` - Groups with member management
+- `app/routes/wallet.py` - Balance and spending statistics
 
 ### Frontend
-- `pages/login.tsx` - NEW login/register page
-- `pages/_app.tsx` - Added auth middleware
-- `pages/index.tsx` - Updated to check auth
-- `lib/api.ts` - Added auth methods
-- `components/Header.tsx` - Added logout and user info
+- `pages/login.tsx` - Login/register interface
+- `pages/_app.tsx` - Auth middleware protecting routes
+- `pages/index.tsx` - Home page redirects to dashboard
+- `pages/dashboard.tsx` - Shows groups and balance
+- `pages/groups.tsx` - Groups list with member management
+- `pages/transactions.tsx` - Expense list
+- `pages/wallet.tsx` - Wallet balance and stats
+- `lib/api.ts` - API methods with auth
+- `components/Header.tsx` - Shows username and logout
+- `components/GroupModal.tsx` - Create group
+- `components/AddMembersModal.tsx` - Add members to group (NEW)
+- `components/ExpenseModal.tsx` - Add expense with member selection
 
 ## Code Quality
 
@@ -96,22 +104,51 @@ All code is:
 
 ## Testing Multi-User Scenario
 
+### Setup
 1. Open http://localhost:3000
-2. You'll be redirected to login page
-3. Login as "john" (password: password123)
-4. See John's dashboard
-5. Open new incognito window
-6. Login as "alex" (password: password123)
-7. Add an expense in John's browser
-8. Refresh Alex's browser
-9. See the updated expense split
+2. Click Register
+3. Create User 1: alice / alice@test.com / pass123
+4. Create User 2: Use new incognito window, register bob / bob@test.com / pass123
+
+### Testing Group & Expense Flow
+1. **Login as Alice**
+   - Click "Create Group" → "Trip"
+   - Groups page shows "Trip" (empty members)
+   - Click "Add Members" → Select Bob
+   - Trip now shows Bob as member
+
+2. **Add Expense as Alice**
+   - Click "Add Expense"
+   - Title: "Dinner", Amount: $60
+   - Group: "Trip"
+   - Members auto-loaded: Alice, Bob
+   - Both checked (equal split)
+   - Submit
+
+3. **View as Alice**
+   - Dashboard: "Trip" shows $30 owed
+   - Transactions: "Dinner" shows $60 paid
+   - Wallet: Total spent $60, owed by others $30
+
+4. **View as Bob** (incognito/other browser)
+   - Dashboard: "Trip" shows $30 owed
+   - Transactions: "Dinner" shows owes $30
+   - Wallet: You owe others $30
+
+### Multi-Tab Testing
+- Open two browser tabs (one incognito)
+- Login as different users
+- Add multiple expenses
+- Watch real-time updates across tabs
+- All group members see all group expenses
 
 ## Database
 
-- SQLite stored in `backend/app/penny_pals.db`
+- SQLite stored in `backend/instance/penny_pals.db`
 - Auto-created on first run
-- Pre-seeded with test data (john, alex, sam)
-- Foreign keys for Users, Groups, Expenses, Splits
+- **Starts empty** - no pre-seeded data
+- Register users manually via frontend
+- Proper foreign keys for data relationships
 
 ## Security Considerations
 

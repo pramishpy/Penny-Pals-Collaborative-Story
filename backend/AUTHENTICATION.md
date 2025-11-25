@@ -61,30 +61,25 @@ Each route includes `get_current_user()` helper that:
 - Uses `SECRET_KEY` in app configuration
 - CORS configured with `supports_credentials=True` for cookies
 
-### 5. **Test Users**
-Three pre-seeded users for testing:
-
-| Username | Password | Name |
-|----------|----------|------|
-| john | password123 | John Doe |
-| alex | password123 | Alex Smith |
-| sam | password123 | Sam Johnson |
+### 5. **Database Initialization**
+Database starts empty - no pre-seeded users. Users must register themselves.
+- SQLite database auto-created at `backend/instance/penny_pals.db`
+- All tables created on first run
+- Fresh start for each deployment
 
 ## Frontend Changes
 
 ### 1. **New Login Page** (`pages/login.tsx`)
-- Clean, modern login/register interface
-- Supports both login and registration modes
+- Clean login/register interface
 - Toggle between modes
-- Demo credentials displayed on login page
-- Form validation with user-friendly errors
+- Form validation with error display
 - Responsive design with gradient background
 
 Features:
 - Username/password login
 - Full registration (username, email, password, name)
-- Password confirmation matching
-- Real-time error display
+- Password confirmation
+- Real-time error messages
 - Loading states
 
 ### 2. **Authentication Middleware** (`pages/_app.tsx`)
@@ -117,59 +112,76 @@ New auth methods:
 
 ## Split Sharing Implementation
 
-### Expense Splits
-- Expenses automatically split equally among all participants
-- When adding an expense, specify:
-  - Title
-  - Amount
-  - Group (optional) - if group, splits among all group members
-  - If no group, splits between current user and one other user
+### Group Management
+- Users create groups (user auto-added as creator)
+- Add existing users to groups via "Add Members" modal
+- Only group members can see the group and its expenses
+- Group members can add new members to the group
 
-### Group Sharing
-- Create groups and add members
-- When expense is added to group, automatically splits among all members
-- Members contribute their share automatically
+### Expense Splitting
+- Create expenses within a group
+- Select which group members participate
+- Amount automatically divided equally among participants
+- Each participant gets an ExpenseSplit record for their share
+- User can see total owed to/by them in wallet
 
-### Current User Context
-All operations now scoped to authenticated user:
-- Dashboard shows only that user's expenses
-- Transactions show only that user's splits
-- Wallet shows only that user's balance
-- Groups show only those the user is member of
+### User Isolation
+- All operations scoped to authenticated user
+- Dashboard shows only user's groups
+- Transactions show only expenses from user's groups
+- Wallet shows only user's balance and splits
+- Users cannot see other users' groups or expenses
 
 ## How to Test Multi-User Split Sharing
 
 ### Setup
-1. Start backend: `python run.py` (runs on port 5000)
-2. Start frontend: `npm run dev` (runs on port 3000)
+1. Start backend: `python run.py` (runs on http://localhost:5000)
+2. Start frontend: `npm run dev` (runs on http://localhost:3000)
 3. Open http://localhost:3000 in browser
 
 ### Test Scenario
-1. **Browser 1 - Login as John**
-   - Go to login page
-   - Username: `john`, Password: `password123`
-   - See John's dashboard
+1. **Register User 1** (Alice)
+   - Click Register
+   - Username: `alice`, Email: `alice@test.com`, Password: `pass123`, Name: `Alice`
+   - See dashboard (empty initially)
 
-2. **Browser 2 - Login as Alex** (or incognito window)
-   - Go to login page
-   - Username: `alex`, Password: `password123`
-   - See Alex's dashboard
+2. **Register User 2** (Bob) - Use incognito/new browser
+   - Register with username: `bob`, Email: `bob@test.com`, Password: `pass123`, Name: `Bob`
 
-3. **Add Expense as John**
-   - Go to Transactions page
-   - Add new expense: "Dinner" for $60
-   - This splits between John (paid $60) and Alex (owes $30)
+3. **Create Group (Alice)**
+   - Click "Create Group"
+   - Name: "Trip"
+   - Submit → Group created
 
-4. **View as Both Users**
-   - John's view: Shows he paid $60, owes nothing
-   - Alex's view: Shows he owes $30 to John
-   - Real-time reflection across both browsers/sessions
+4. **Add Members (Alice)**
+   - View Groups → Click "Trip"
+   - Click "Add Members"
+   - Select Bob
+   - Bob is now in group
 
-5. **Multi-User Group**
-   - Create group with multiple members
-   - Add expense to group
-   - All members see their share
-   - Each user only sees their own perspective
+5. **Add Expense (Alice)**
+   - Click "Add Expense"
+   - Title: "Dinner", Amount: $60
+   - Select Group: "Trip"
+   - Members auto-loaded: Alice, Bob
+   - Both checked (equal split)
+   - Submit → Expense created: Alice paid $60, Bob owes $30
+
+6. **View as Alice**
+   - Dashboard: "Trip" group shows $30 owed
+   - Transactions: "Dinner" shows paid $60
+   - Wallet: Total spent $60, owed by others $30
+
+7. **View as Bob** (incognito/other browser)
+   - Dashboard: "Trip" group shows $30 owed
+   - Transactions: "Dinner" shows owes $30 to Alice
+   - Wallet: You owe others $30
+
+### Multi-Tab Testing
+- Open two browser tabs in incognito mode
+- Login as different users
+- Add expenses and watch real-time updates
+- Members see all group expenses instantly
 
 ## Dependencies Added
 
