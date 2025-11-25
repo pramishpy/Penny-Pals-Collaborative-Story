@@ -17,17 +17,20 @@ def get_dashboard():
         total_owed = 0
         groups_summary = []
         
-        # Get all groups user is part of
-        user_groups = db.session.query(Group).join(
-            db.Table('group_members', 
-                db.Column('user_id', db.String), 
-                db.Column('group_id', db.String)
-            )
-        ).filter(Group.id.in_(
-            [g.id for g in user.groups]
-        )).all()
+        # Define gradient colors for groups
+        gradients = [
+            'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+            'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+            'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+        ]
         
-        for group in user_groups:
+        # Get all groups user is part of
+        user_groups = user.groups
+        
+        for idx, group in enumerate(user_groups):
             group_expenses = Expense.query.filter_by(group_id=group.id).all()
             group_amount = sum(exp.amount for exp in group_expenses) / len(group_expenses) if group_expenses else 0
             total_owed += group_amount
@@ -35,7 +38,8 @@ def get_dashboard():
             groups_summary.append({
                 'id': group.id,
                 'name': group.name,
-                'amount': f'${group_amount:.2f}'
+                'amount': f'${group_amount:.2f}',
+                'color': gradients[idx % len(gradients)]
             })
         
         return {
