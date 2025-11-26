@@ -38,13 +38,7 @@ pip install -r requirements.txt
 
 Initialize the database:
 
-The application uses a SQLite database (`app.db`). To initialize it with the required schema:
-
-```bash
-python3 -c "from app import create_app, db; app = create_app(); app.app_context().push(); db.create_all()"
-```
-
-Or simply run the application, which will create the database if it doesn't exist.
+The application uses a SQLite database (`app.db`). To initialize it with the required schemasimply run the application, which will create the database if it doesn't exist.
 
 Run the backend server:
 
@@ -75,6 +69,7 @@ npm run dev
 ```
 
 The frontend will start on `http://localhost:3000`.
+Make sure you sign up and set up users if you are logging in for the first time.
 
 ## Running the Application
 
