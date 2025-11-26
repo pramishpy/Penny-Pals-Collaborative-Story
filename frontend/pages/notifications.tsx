@@ -45,19 +45,19 @@ export default function Notifications() {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-gray-50">
+        <div className="flex flex-col min-h-screen bg-background transition-colors">
             <Header title="Notifications" />
 
             <main className="flex-1 container-main py-8">
                 <div className="mb-8">
-                    <h2 className="text-3xl font-bold text-gray-900">Notifications</h2>
+                    <h2 className="text-3xl font-bold text-foreground">Notifications</h2>
                 </div>
 
                 <Card title="Recent Activity">
                     {loading ? (
                         <div className="text-center py-12">
-                            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                            <p className="mt-4 text-gray-600">Loading notifications...</p>
+                            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                            <p className="mt-4 text-muted-foreground">Loading notifications...</p>
                         </div>
                     ) : notifications.length > 0 ? (
                         <div className="divide-y divide-border">
