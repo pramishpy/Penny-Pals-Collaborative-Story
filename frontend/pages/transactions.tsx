@@ -77,6 +77,19 @@ export default function Transactions() {
                     )}
                 </Card>
             </main>
+      <main className="flex-1 container-main py-8">
+        <div className="flex justify-between items-center mb-12 gap-8">
+          <h2 className="text-3xl font-bold">All Transactions</h2>
+          <div className="flex gap-5">
+            <Button 
+              label="Add Expense" 
+              type="primary" 
+              icon="+" 
+              onClick={() => setIsModalOpen(true)}
+            />
+            <Button label="Export" type="secondary" icon="📋" />
+          </div>
+        </div>
 
             <Footer year={2025} />
 
