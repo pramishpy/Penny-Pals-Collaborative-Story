@@ -1,4 +1,4 @@
-# PennyPals - Collaborative Story & Fintech App
+# PennyPals 
 
 PennyPals is a collaborative application with features for managing finances, splitting expenses, and more. This project consists of a Flask backend and a Next.js frontend.
 
