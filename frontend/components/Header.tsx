@@ -54,13 +54,16 @@ export default function Header({ title, logo }: HeaderProps) {
         <header className="w-full border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-50 transition-colors">
             <div className="container-main py-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <span className="text-2xl font-bold tracking-tight">
+                    <a 
+                        href="/dashboard" 
+                        className="text-2xl font-bold tracking-tight cursor-pointer hover:opacity-80 transition-opacity"
+                    >
                         <span className="text-primary">P</span>
                         <span className="text-foreground">enny</span>
                         {' '}
                         <span className="text-primary">P</span>
                         <span className="text-foreground">als</span>
-                    </span>
+                    </a>
                 </div>
                 <nav className="flex gap-8 items-center">
                     <a href="/dashboard" className="font-medium hover:text-primary transition-colors text-foreground">
