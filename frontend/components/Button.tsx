@@ -6,6 +6,7 @@ interface ButtonProps {
   type?: 'primary' | 'secondary';
   className?: string;
   icon?: string;
+  disabled?: boolean;
 }
 
 export default function Button({
@@ -14,6 +15,7 @@ export default function Button({
   type = 'primary',
   className = '',
   icon,
+  disabled,
 }: ButtonProps) {
   const baseClass =
     type === 'primary' ? 'btn-primary' : 'btn-secondary';
@@ -22,6 +24,7 @@ export default function Button({
     <button
       onClick={onClick}
       className={`${baseClass} ${className}`}
+      disabled={disabled}
     >
       {icon && <span className="mr-2">{icon}</span>}
       {label}

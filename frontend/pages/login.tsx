@@ -102,26 +102,26 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-background transition-colors">
+      <div className="w-full max-w-md px-4">
         {/* Card */}
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="card p-8 shadow-xl border-border">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-2">
-              <span className="text-blue-600">P</span>
-              <span className="text-gray-800">enny</span>
-              <span className="text-blue-600">P</span>
-              <span className="text-indigo-600">als</span>
+            <h1 className="text-4xl font-bold mb-2 tracking-tight">
+              <span className="text-primary">P</span>
+              <span className="text-foreground">enny</span>
+              <span className="text-primary">P</span>
+              <span className="text-foreground">als</span>
             </h1>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               {isLogin ? 'Welcome back!' : 'Join our community'}
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-xl text-sm font-medium">
               {error}
             </div>
           )}
@@ -129,7 +129,7 @@ export default function Login() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="username" className="block text-sm font-medium text-foreground mb-1">
                 Username
               </label>
               <input
@@ -140,14 +140,14 @@ export default function Login() {
                 onChange={handleChange}
                 placeholder="Enter your username"
                 disabled={loading}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                className="input-field"
               />
             </div>
 
             {!isLogin && (
               <>
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1">
                     Full Name
                   </label>
                   <input
@@ -158,12 +158,12 @@ export default function Login() {
                     onChange={handleChange}
                     placeholder="Enter your full name"
                     disabled={loading}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                    className="input-field"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1">
                     Email
                   </label>
                   <input
@@ -174,14 +174,14 @@ export default function Login() {
                     onChange={handleChange}
                     placeholder="Enter your email"
                     disabled={loading}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                    className="input-field"
                   />
                 </div>
               </>
             )}
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-1">
                 Password
               </label>
               <input
@@ -192,13 +192,13 @@ export default function Login() {
                 onChange={handleChange}
                 placeholder="Enter your password"
                 disabled={loading}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                className="input-field"
               />
             </div>
 
             {!isLogin && (
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground mb-1">
                   Confirm Password
                 </label>
                 <input
@@ -209,7 +209,7 @@ export default function Login() {
                   onChange={handleChange}
                   placeholder="Confirm your password"
                   disabled={loading}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                  className="input-field"
                 />
               </div>
             )}
@@ -217,7 +217,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full btn-primary"
             >
               {loading ? 'Processing...' : isLogin ? 'Login' : 'Register'}
             </button>
@@ -225,29 +225,17 @@ export default function Login() {
 
           {/* Toggle Mode */}
           <div className="mt-6 text-center">
-            <p className="text-gray-600 text-sm">
+            <p className="text-muted-foreground text-sm">
               {isLogin ? "Don't have an account? " : 'Already have an account? '}
               <button
                 onClick={toggleMode}
                 disabled={loading}
-                className="text-blue-600 hover:text-blue-700 font-semibold transition disabled:opacity-50"
+                className="text-primary hover:text-primary/80 font-semibold transition disabled:opacity-50"
               >
                 {isLogin ? 'Sign up' : 'Login'}
               </button>
             </p>
           </div>
-
-          {/* Demo Info */}
-          {isLogin && (
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <p className="text-xs font-semibold text-blue-900 mb-2">Demo Credentials:</p>
-              <div className="text-xs text-blue-800 space-y-1">
-                <p><strong>Username:</strong> john | <strong>Password:</strong> password123</p>
-                <p><strong>Username:</strong> alex | <strong>Password:</strong> password123</p>
-                <p><strong>Username:</strong> sam | <strong>Password:</strong> password123</p>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

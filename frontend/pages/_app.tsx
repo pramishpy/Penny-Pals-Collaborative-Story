@@ -13,13 +13,29 @@ export default function App({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     checkAuth();
-  }, []);
+
+    // Initialize theme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [router.pathname]);
 
   const checkAuth = async () => {
     try {
       // Try to get current user
-      await api.getCurrentUser();
-      setIsAuthenticated(true);
+      const data = await api.getCurrentUser();
+      if (data?.user) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+        // If not authenticated and not on a public page, redirect to login
+        if (!publicPages.includes(router.pathname)) {
+          router.push('/login');
+        }
+      }
     } catch (error) {
       setIsAuthenticated(false);
       // If not authenticated and not on a public page, redirect to login

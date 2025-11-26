@@ -75,7 +75,7 @@ export default function Settings() {
     if (savedTheme) {
       setSettings(prev => ({ ...prev, theme: savedTheme }));
     }
-    
+
     const savedCurrency = localStorage.getItem('currency');
     if (savedCurrency) {
       setSettings(prev => ({ ...prev, currency: savedCurrency }));
@@ -135,71 +135,69 @@ export default function Settings() {
   const selectedCurrency = CURRENCIES.find(c => c.code === settings.currency) || CURRENCIES[0];
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div className="flex flex-col min-h-screen bg-background transition-colors">
       <Header title="Settings" />
 
       <main className="flex-1 container-main py-8">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">
+        <div className="w-full">
+          <h1 className="text-3xl font-bold mb-8 text-foreground">
             Settings
           </h1>
 
           {saveMessage && (
-            <div className="mb-6 p-4 bg-green-100 dark:bg-green-900 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-300 rounded-lg">
+            <div className="mb-6 p-4 bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-300 rounded-xl">
               {saveMessage}
             </div>
           )}
 
-          <Card title="Theme Settings" className="mb-6 dark:bg-gray-800 dark:text-white">
+          <Card title="Theme Settings" className="mb-6">
             <div className="space-y-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-muted-foreground">
                 Choose your preferred theme for the application
               </p>
               <div className="flex gap-4">
                 <button
                   onClick={() => handleThemeChange('light')}
-                  className={`flex-1 p-4 rounded-lg border-2 transition-all ${
-                    settings.theme === 'light'
-                      ? 'border-primary bg-primary/10 dark:bg-primary/20'
-                      : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
-                  }`}
+                  className={`flex-1 p-4 rounded-xl border-2 transition-all ${settings.theme === 'light'
+                    ? 'border-primary bg-primary/10'
+                    : 'border-border hover:border-primary/50'
+                    }`}
                 >
                   <div className="text-center">
                     <div className="text-2xl mb-2">☀️</div>
-                    <div className="font-semibold">Light Mode</div>
+                    <div className="font-semibold text-foreground">Light Mode</div>
                   </div>
                 </button>
                 <button
                   onClick={() => handleThemeChange('dark')}
-                  className={`flex-1 p-4 rounded-lg border-2 transition-all ${
-                    settings.theme === 'dark'
-                      ? 'border-primary bg-primary/10 dark:bg-primary/20'
-                      : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
-                  }`}
+                  className={`flex-1 p-4 rounded-xl border-2 transition-all ${settings.theme === 'dark'
+                    ? 'border-primary bg-primary/10'
+                    : 'border-border hover:border-primary/50'
+                    }`}
                 >
                   <div className="text-center">
                     <div className="text-2xl mb-2">🌙</div>
-                    <div className="font-semibold">Dark Mode</div>
+                    <div className="font-semibold text-foreground">Dark Mode</div>
                   </div>
                 </button>
               </div>
             </div>
           </Card>
 
-          <Card title="Currency Preference" className="mb-6 dark:bg-gray-800 dark:text-white">
+          <Card title="Currency Preference" className="mb-6">
             <div className="space-y-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-muted-foreground">
                 Select your default currency for displaying amounts
               </p>
               <div>
-                <label htmlFor="currency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="currency" className="block text-sm font-medium text-foreground mb-2">
                   Default Currency
                 </label>
                 <select
                   id="currency"
                   value={settings.currency}
                   onChange={(e) => handleCurrencyChange(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="input-field"
                 >
                   {CURRENCIES.map((currency) => (
                     <option key={currency.code} value={currency.code}>
@@ -207,14 +205,14 @@ export default function Settings() {
                     </option>
                   ))}
                 </select>
-                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                <p className="mt-2 text-sm text-muted-foreground">
                   Current selection: {selectedCurrency.code} {selectedCurrency.symbol}
                 </p>
               </div>
             </div>
           </Card>
 
-          <Card title="Account" className="mb-6 dark:bg-gray-800 dark:text-white">
+          <Card title="Account" className="mb-6">
             <div className="space-y-4">
               {loading ? (
                 <div className="text-center py-4">
@@ -223,27 +221,27 @@ export default function Settings() {
               ) : currentUser ? (
                 <>
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700">
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Username</span>
-                      <span className="text-sm text-gray-900 dark:text-white">{currentUser.username}</span>
+                    <div className="flex items-center justify-between py-2 border-b border-border">
+                      <span className="text-sm font-medium text-muted-foreground">Username</span>
+                      <span className="text-sm text-foreground">{currentUser.username}</span>
                     </div>
-                    <div className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700">
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Email</span>
-                      <span className="text-sm text-gray-900 dark:text-white">{currentUser.email}</span>
+                    <div className="flex items-center justify-between py-2 border-b border-border">
+                      <span className="text-sm font-medium text-muted-foreground">Email</span>
+                      <span className="text-sm text-foreground">{currentUser.email}</span>
                     </div>
-                    <div className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700">
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Name</span>
-                      <span className="text-sm text-gray-900 dark:text-white">{currentUser.name}</span>
+                    <div className="flex items-center justify-between py-2 border-b border-border">
+                      <span className="text-sm font-medium text-muted-foreground">Name</span>
+                      <span className="text-sm text-foreground">{currentUser.name}</span>
                     </div>
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Status</span>
+                      <span className="text-sm font-medium text-muted-foreground">Status</span>
                       <span className="text-sm text-green-600 dark:text-green-400 font-semibold">Logged In</span>
                     </div>
                   </div>
                   <div className="pt-4">
                     <button
                       onClick={handleLogout}
-                      className="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors"
+                      className="w-full px-4 py-2 bg-destructive text-destructive-foreground hover:bg-destructive/90 font-semibold rounded-xl transition-colors"
                     >
                       Log Out
                     </button>
@@ -251,19 +249,19 @@ export default function Settings() {
                 </>
               ) : (
                 <div className="text-center py-4">
-                  <p className="text-gray-600 dark:text-gray-400">Unable to load user information</p>
+                  <p className="text-muted-foreground">Unable to load user information</p>
                 </div>
               )}
             </div>
           </Card>
 
-          <Card title="Push Notifications" className="mb-6 dark:bg-gray-800 dark:text-white">
+          <Card title="Push Notifications" className="mb-6">
             <div className="space-y-6">
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white">Enable Notifications</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <h4 className="font-semibold text-foreground">Enable Notifications</h4>
+                    <p className="text-sm text-muted-foreground">
                       Master toggle for all notification types
                     </p>
                   </div>
@@ -274,17 +272,17 @@ export default function Settings() {
                       onChange={(e) => handleNotificationToggle(e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 dark:peer-focus:ring-primary/40 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                    <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                   </label>
                 </div>
               </div>
 
               {settings.pushNotificationsEnabled && (
-                <div className="space-y-4 pl-4 border-l-2 border-gray-200 dark:border-gray-700">
+                <div className="space-y-4 pl-4 border-l-2 border-border">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium text-gray-900 dark:text-white">Expense Reminders</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <h4 className="font-medium text-foreground">Expense Reminders</h4>
+                      <p className="text-sm text-muted-foreground">
                         Get notified about upcoming expense deadlines
                       </p>
                     </div>
@@ -295,14 +293,14 @@ export default function Settings() {
                         onChange={(e) => handleNotificationPreferenceChange('expenseReminders', e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 dark:peer-focus:ring-primary/40 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                      <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                     </label>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium text-gray-900 dark:text-white">Group Updates</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <h4 className="font-medium text-foreground">Group Updates</h4>
+                      <p className="text-sm text-muted-foreground">
                         Receive notifications when groups are updated
                       </p>
                     </div>
@@ -313,14 +311,14 @@ export default function Settings() {
                         onChange={(e) => handleNotificationPreferenceChange('groupUpdates', e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 dark:peer-focus:ring-primary/40 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                      <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                     </label>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium text-gray-900 dark:text-white">Payment Notifications</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <h4 className="font-medium text-foreground">Payment Notifications</h4>
+                      <p className="text-sm text-muted-foreground">
                         Get notified about payment requests and settlements
                       </p>
                     </div>
@@ -331,7 +329,7 @@ export default function Settings() {
                         onChange={(e) => handleNotificationPreferenceChange('paymentNotifications', e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 dark:peer-focus:ring-primary/40 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                      <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                     </label>
                   </div>
                 </div>

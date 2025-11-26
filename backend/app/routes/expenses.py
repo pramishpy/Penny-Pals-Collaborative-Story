@@ -97,6 +97,8 @@ def add_expense():
         
         group_id = data.get('group_id')
         amount = float(data['amount'])
+        split_type = data.get('split_type', 'equal')
+        custom_splits = data.get('splits', {})
         
         # Determine participants
         participants = []
@@ -132,18 +134,45 @@ def add_expense():
         )
         db.session.add(expense)
         
-        # Create splits - divide equally among participants
-        split_amount = amount / len(participants)
-        for participant in participants:
-            split_id = generate_id()
-            split = ExpenseSplit(
-                id=split_id,
-                expense_id=expense_id,
-                user_id=participant.id,
-                amount=split_amount
-            )
-            db.session.add(split)
-        
+        # Calculate splits
+        if split_type == 'equal':
+            split_amount = amount / len(participants)
+            for participant in participants:
+                split_id = generate_id()
+                split = ExpenseSplit(
+                    id=split_id,
+                    expense_id=expense_id,
+                    user_id=participant.id,
+                    amount=split_amount
+                )
+                db.session.add(split)
+        else:
+            # Handle unequal/percentage splits
+            total_split_amount = 0
+            for participant in participants:
+                split_val = custom_splits.get(participant.id, 0)
+                # Ensure split_val is float
+                try:
+                    split_val = float(split_val)
+                except (ValueError, TypeError):
+                    split_val = 0.0
+                
+                total_split_amount += split_val
+                
+                split_id = generate_id()
+                split = ExpenseSplit(
+                    id=split_id,
+                    expense_id=expense_id,
+                    user_id=participant.id,
+                    amount=split_val
+                )
+                db.session.add(split)
+            
+            # Validate total split amount matches expense amount (allow small float error)
+            if abs(total_split_amount - amount) > 0.01:
+                # Rollback is handled by exception handler
+                raise ValueError(f"Split amounts (${total_split_amount:.2f}) do not match total amount (${amount:.2f})")
+
         db.session.commit()
         
         return {

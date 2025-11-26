@@ -69,12 +69,25 @@ class ExpenseSplit(db.Model):
     
     user = db.relationship('User', backref='splits')
 
+class Notification(db.Model):
+    __tablename__ = 'notifications'
+    __table_args__ = {'extend_existing': True}
+    
+    id = db.Column(db.String(36), primary_key=True)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    message = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    read = db.Column(db.Boolean, default=False)
+    type = db.Column(db.String(20), default='info') # info, success, warning, error
+
 class Wallet(db.Model):
     __tablename__ = 'wallets'
     __table_args__ = {'extend_existing': True}
     
     id = db.Column(db.String(36), primary_key=True)
-    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), unique=True, nullable=False)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
     balance = db.Column(db.Float, default=0.0)
+    card_last_four = db.Column(db.String(4), default='1234')
+    bank_account = db.Column(db.String(20), nullable=True)
     
-    user = db.relationship('User', backref='wallet', uselist=False)
+    user = db.relationship('User', backref=db.backref('wallet', uselist=False))

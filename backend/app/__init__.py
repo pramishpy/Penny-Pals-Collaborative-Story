@@ -6,6 +6,7 @@ from app.routes.dashboard import dashboard_bp
 from app.routes.expenses import expenses_bp
 from app.routes.groups import groups_bp
 from app.routes.wallet import wallet_bp
+from app.routes.notifications import notifications_bp
 
 def create_app(config_name='development'):
     app = Flask(__name__)
@@ -25,6 +26,7 @@ def create_app(config_name='development'):
     app.register_blueprint(expenses_bp, url_prefix='/api')
     app.register_blueprint(groups_bp, url_prefix='/api')
     app.register_blueprint(wallet_bp, url_prefix='/api')
+    app.register_blueprint(notifications_bp, url_prefix='/api')
     
     # Error handlers
     @app.errorhandler(404)
