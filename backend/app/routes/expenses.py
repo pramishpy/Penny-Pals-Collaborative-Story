@@ -1,16 +1,23 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from app.models import db, Expense, ExpenseSplit, User, Group
 from app.utils.helpers import generate_id, serialize_model, handle_error
 
 expenses_bp = Blueprint('expenses', __name__)
 
+def get_current_user():
+    """Get current logged-in user from session"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return None
+    return User.query.get(user_id)
+
 @expenses_bp.route('/expenses', methods=['GET'])
 def get_expenses():
     """Get all expenses for current user"""
     try:
-        user = User.query.first()
+        user = get_current_user()
         if not user:
-            return {'transactions': []}, 200
+            return {'error': 'Not authenticated'}, 401
         
         # Icon mapping based on keywords
         def get_icon(title):
@@ -32,10 +39,10 @@ def get_expenses():
             else:
                 return '💰'
         
-        # Get expenses paid by user or user is part of
+        # Get expenses only from groups user is a member of
+        user_group_ids = [g.id for g in user.groups]
         expenses = Expense.query.filter(
-            (Expense.paid_by == user.id) |
-            (Expense.splits.any(ExpenseSplit.user_id == user.id))
+            Expense.group_id.in_(user_group_ids)
         ).order_by(Expense.date.desc()).all()
         
         transactions = []
@@ -73,6 +80,10 @@ def get_transactions():
 def add_expense():
     """Add new expense"""
     try:
+        user = get_current_user()
+        if not user:
+            return {'error': 'Not authenticated'}, 401
+        
         data = request.json
         
         # Validate required fields
@@ -80,31 +91,31 @@ def add_expense():
         if not all(field in data for field in required_fields):
             return handle_error('Missing required fields')
         
-        user = User.query.first()
-        if not user:
-            return handle_error('User not found', 404)
-        
         group_id = data.get('group_id')
         amount = float(data['amount'])
         
         # Determine participants
         participants = []
-        if group_id:
+        if 'participants' in data and data['participants']:
+            # Use explicitly selected participants
+            participant_ids = data['participants']
+            for pid in participant_ids:
+                p = User.query.get(pid)
+                if p:
+                    participants.append(p)
+        elif group_id:
             # Get all members of the group
-            group = db.session.query(Group).filter_by(id=group_id).first()
-            if group and group.members:
-                participants = group.members
-            else:
-                # Fallback to current user and one other user
-                all_users = User.query.limit(2).all()
-                participants = all_users
+            group = Group.query.filter_by(id=group_id).first()
+            if not group:
+                return handle_error('Group not found', 404)
+            if user not in group.members:
+                return handle_error('You are not a member of this group', 403)
+            participants = group.members
         else:
-            # No group specified, split with current user and one other
-            all_users = User.query.limit(2).all()
-            participants = all_users
+            return handle_error('Either group_id or participants list is required', 400)
         
         if not participants:
-            participants = [user]
+            return handle_error('No participants for this expense', 400)
         
         # Create expense
         expense_id = generate_id()

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { api } from '../lib/api';
 
 interface GroupModalProps {
   isOpen: boolean;
@@ -9,26 +10,26 @@ interface GroupModalProps {
 export default function GroupModal({ isOpen, onClose, onSuccess }: GroupModalProps) {
   const [groupName, setGroupName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!groupName.trim()) {
-      alert('Please enter a group name');
+      setError('Please enter a group name');
       return;
     }
 
     setLoading(true);
     try {
-      const { api } = await import('../lib/api');
       await api.addGroup({ name: groupName.trim() });
       
-      alert(`Group "${groupName}" created successfully!`);
       setGroupName('');
+      setError('');
       onSuccess();
       onClose();
-    } catch (error) {
-      alert('Failed to create group: ' + error);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create group');
     } finally {
       setLoading(false);
     }
@@ -49,6 +50,12 @@ export default function GroupModal({ isOpen, onClose, onSuccess }: GroupModalPro
           </button>
         </div>
 
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
@@ -68,7 +75,7 @@ export default function GroupModal({ isOpen, onClose, onSuccess }: GroupModalPro
 
             <div className="bg-blue-50 p-4 rounded-lg">
               <p className="text-sm text-gray-600">
-                💡 Create a group to organize and split expenses with friends
+                💡 You're automatically added. Add more members from the group details.
               </p>
             </div>
           </div>
