@@ -86,32 +86,32 @@ export default function AddMembersModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
-        <h2 className="text-2xl font-bold mb-2">Add Members</h2>
-        <p className="text-gray-600 mb-6">Add members to <strong>{groupName}</strong></p>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
+      <div className="card p-8 max-w-md w-full mx-4 shadow-xl">
+        <h2 className="text-2xl font-bold mb-2 text-foreground">Add Members</h2>
+        <p className="text-muted-foreground mb-6">Add members to <strong>{groupName}</strong></p>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded mb-4">
             {error}
           </div>
         )}
 
         <div className="space-y-3 mb-6 max-h-64 overflow-y-auto">
           {users.length === 0 ? (
-            <p className="text-gray-500 text-center py-4">No available users to add</p>
+            <p className="text-muted-foreground text-center py-4">No available users to add</p>
           ) : (
             users.map(user => (
-              <label key={user.id} className="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+              <label key={user.id} className="flex items-center p-3 border border-border rounded-lg hover:bg-accent cursor-pointer transition-colors">
                 <input
                   type="checkbox"
                   checked={selectedMembers.has(user.id)}
                   onChange={() => toggleMember(user.id)}
-                  className="w-4 h-4 text-blue-600 rounded cursor-pointer"
+                  className="w-4 h-4 text-primary rounded cursor-pointer"
                 />
                 <div className="ml-3 flex-1">
-                  <p className="font-medium">{user.name}</p>
-                  <p className="text-sm text-gray-500">@{user.username}</p>
+                  <p className="font-medium text-foreground">{user.name}</p>
+                  <p className="text-sm text-muted-foreground">@{user.username}</p>
                 </div>
               </label>
             ))
@@ -121,14 +121,14 @@ export default function AddMembersModal({
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
+            className="flex-1 btn-secondary"
           >
             Cancel
           </button>
           <button
             onClick={handleAddMembers}
             disabled={loading || selectedMembers.size === 0}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:bg-gray-400"
+            className="flex-1 btn-primary"
           >
             {loading ? 'Adding...' : `Add (${selectedMembers.size})`}
           </button>

@@ -60,49 +60,49 @@ export default function Notifications() {
                             <p className="mt-4 text-gray-600">Loading notifications...</p>
                         </div>
                     ) : notifications.length > 0 ? (
-                        <div className="divide-y divide-gray-100">
+                        <div className="divide-y divide-border">
                             {notifications.map((notification) => {
                                 let Icon = Info;
                                 let iconColor = 'text-blue-500';
-                                let bgColor = 'bg-blue-50';
+                                let bgColor = 'bg-blue-500/10';
 
                                 switch (notification.type) {
                                     case 'success':
                                         Icon = CheckCircle;
                                         iconColor = 'text-green-500';
-                                        bgColor = 'bg-green-50';
+                                        bgColor = 'bg-green-500/10';
                                         break;
                                     case 'warning':
                                         Icon = AlertTriangle;
                                         iconColor = 'text-yellow-500';
-                                        bgColor = 'bg-yellow-50';
+                                        bgColor = 'bg-yellow-500/10';
                                         break;
                                     case 'error':
                                         Icon = XCircle;
                                         iconColor = 'text-red-500';
-                                        bgColor = 'bg-red-50';
+                                        bgColor = 'bg-red-500/10';
                                         break;
                                 }
 
                                 return (
                                     <div
                                         key={notification.id}
-                                        className={`p-4 flex items-start gap-4 hover:bg-gray-50 transition cursor-pointer ${!notification.read ? 'bg-blue-50/30' : ''}`}
+                                        className={`p-4 flex items-start gap-4 hover:bg-accent/50 transition cursor-pointer ${!notification.read ? 'bg-primary/5' : ''}`}
                                         onClick={() => !notification.read && markAsRead(notification.id)}
                                     >
                                         <div className={`p-2 rounded-full ${bgColor} ${iconColor}`}>
                                             <Icon className="w-5 h-5" />
                                         </div>
                                         <div className="flex-1">
-                                            <p className={`text-gray-900 ${!notification.read ? 'font-semibold' : ''}`}>
+                                            <p className={`text-foreground ${!notification.read ? 'font-semibold' : ''}`}>
                                                 {notification.message}
                                             </p>
-                                            <p className="text-xs text-gray-500 mt-1">
+                                            <p className="text-xs text-muted-foreground mt-1">
                                                 {new Date(notification.created_at).toLocaleDateString()} at {new Date(notification.created_at).toLocaleTimeString()}
                                             </p>
                                         </div>
                                         {!notification.read && (
-                                            <div className="w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
+                                            <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
                                         )}
                                     </div>
                                 );
@@ -110,8 +110,8 @@ export default function Notifications() {
                         </div>
                     ) : (
                         <div className="text-center py-12">
-                            <p className="text-gray-600 text-lg mb-2">No notifications</p>
-                            <p className="text-gray-500">You're all caught up!</p>
+                            <p className="text-muted-foreground text-lg mb-2">No notifications</p>
+                            <p className="text-muted-foreground/80">You're all caught up!</p>
                         </div>
                     )}
                 </Card>

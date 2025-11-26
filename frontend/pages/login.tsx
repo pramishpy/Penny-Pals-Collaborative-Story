@@ -14,6 +14,7 @@ export default function Login() {
     password: '',
     name: '',
     confirmPassword: '',
+    currency: 'USD',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,6 +99,7 @@ export default function Login() {
       password: '',
       name: '',
       confirmPassword: '',
+      currency: 'USD',
     });
   };
 

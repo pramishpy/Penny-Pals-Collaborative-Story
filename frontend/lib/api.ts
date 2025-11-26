@@ -26,7 +26,7 @@ export const api = {
   // Auth endpoints
   register: async (userData: any) => {
     try {
-
+      const response = await apiClient.post('/auth/register', userData);
       return response.data;
     } catch (error) {
       handleError(error);
