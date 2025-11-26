@@ -81,12 +81,6 @@ Make sure you sign up and set up users if you are logging in for the first time.
 
 The project uses SQLAlchemy with SQLite. The database file is located at `backend/app.db`.
 
-To add the currency column to an existing database (if needed):
-
-```bash
-cd backend
-python3 update_db_currency.py
-```
 
 ## Troubleshooting
 
