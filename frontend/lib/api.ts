@@ -122,6 +122,15 @@ export const api = {
     }
   },
 
+  deleteGroup: async (groupId: string) => {
+    try {
+      const response = await apiClient.delete(`/groups/${groupId}`);
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+
   // Transaction endpoints
   getTransactions: async () => {
     try {

@@ -72,12 +72,12 @@ export default function Wallet() {
       <Header title="Wallet" />
 
       <main className="flex-1 container-main py-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-4">
-            Current Balance: <span className="text-primary">{loading ? '...' : walletData.balance}</span>
+        <div className="mb-12">
+          <h2 className="text-4xl font-bold">
+            Current Balance: <span className="text-blue-600 font-extrabold">{loading ? '...' : walletData.balance}</span>
           </h2>
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4">
               {error}
             </div>
           )}
@@ -89,54 +89,72 @@ export default function Wallet() {
             <p className="mt-4 text-gray-600">Loading wallet...</p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-8">
-            <div className="col-span-2">
-              <Card title="Your Wallet">
-                <div className="bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl p-8 text-white shadow-lg mb-6">
-                  <p className="text-sm opacity-75 mb-4">VIRTUAL</p>
-                  <p className="text-4xl tracking-widest mb-4">• • • {walletData.card_last_four}</p>
-                  <div className="flex justify-end">
-                    <svg
-                      width="40"
-                      height="24"
-                      viewBox="0 0 40 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <circle cx="12" cy="12" r="10" fill="red" />
-                      <circle cx="22" cy="12" r="10" fill="orange" />
-                    </svg>
+          <div className="flex flex-col gap-12">
+            {/* Top section - Button and Stats on left, Card on right */}
+            <div className="flex flex-col lg:flex-row gap-12">
+              {/* Left side - Button and Stats */}
+              <div className="flex-1 flex flex-col gap-8">
+                {/* Quick Stats */}
+                <Card title="Quick Stats">
+                  <div className="space-y-6">
+                    <div>
+                      <p className="text-gray-600 text-sm font-medium">Total Spent</p>
+                      <p className="text-3xl font-bold text-gray-900 mt-1">{walletData.total_spent}</p>
+                    </div>
+                    <hr className="border-gray-200" />
+                    <div>
+                      <p className="text-gray-600 text-sm font-medium">Others Owe You</p>
+                      <p className="text-3xl font-bold text-green-500 mt-1">{walletData.total_owed_by_others}</p>
+                    </div>
+                    <hr className="border-gray-200" />
+                    <div>
+                      <p className="text-gray-600 text-sm font-medium">You Owe Others</p>
+                      <p className="text-3xl font-bold text-red-500 mt-1">{walletData.total_owed_to_others}</p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+
+              {/* Right side - Wallet Card - Larger and offset */}
+              <div className="flex-1 flex items-start justify-end">
+                <div className="w-full max-w-lg">
+                  {/* Single flat card - credit card proportions */}
+                  <div className="bg-gradient-to-br from-blue-400 via-blue-500 to-cyan-500 rounded-lg p-6 text-white shadow-xl" style={{ aspectRatio: '1.586 / 1' }}>
+                    <div className="flex flex-col h-full justify-between overflow-hidden">
+                      <div>
+                        <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-3 py-0.5 inline-block w-fit">
+                          <p className="text-xs font-semibold tracking-wider">VIRTUAL</p>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <p className="text-2xl tracking-widest font-light leading-tight">•••• •••• •••• {walletData.card_last_four}</p>
+                      </div>
+
+                      <div className="flex items-end justify-between">
+                        <div>
+                          <p className="text-xs text-white text-opacity-75 mb-0.5">CARDHOLDER</p>
+                          <p className="text-xs font-semibold uppercase">User</p>
+                        </div>
+                        <div className="flex -space-x-3">
+                          <div className="w-8 h-8 rounded-full bg-red-600 shadow-lg"></div>
+                          <div className="w-8 h-8 rounded-full bg-orange-500 shadow-lg"></div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-
-                <Button
-                  label="Load balance to your wallet"
-                  onClick={handleLoadBalance}
-                  type="secondary"
-                  className="w-full"
-                />
-              </Card>
+              </div>
             </div>
 
-            <div>
-              <Card title="Quick Stats">
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-gray-600 text-sm">Total Spent</p>
-                    <p className="text-2xl font-bold">{walletData.total_spent}</p>
-                  </div>
-                  <hr />
-                  <div>
-                    <p className="text-gray-600 text-sm">Others Owe You</p>
-                    <p className="text-2xl font-bold text-green-500">{walletData.total_owed_by_others}</p>
-                  </div>
-                  <hr />
-                  <div>
-                    <p className="text-gray-600 text-sm">You Owe Others</p>
-                    <p className="text-2xl font-bold text-red-500">{walletData.total_owed_to_others}</p>
-                  </div>
-                </div>
-              </Card>
+            {/* Centered Load Button Below */}
+            <div className="flex justify-center">
+              <Button
+                label="Load balance to your wallet"
+                onClick={handleLoadBalance}
+                type="secondary"
+                className="w-full max-w-xs py-3"
+              />
             </div>
           </div>
         )}

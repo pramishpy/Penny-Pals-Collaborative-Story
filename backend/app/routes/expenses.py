@@ -39,33 +39,37 @@ def get_expenses():
             else:
                 return '💰'
         
-        # Get expenses only from groups user is a member of
+        # Get all expenses where user is a participant (has a split) from groups they're in
         user_group_ids = [g.id for g in user.groups]
+        
+        # Get all expenses from user's groups, ordered by date
         expenses = Expense.query.filter(
             Expense.group_id.in_(user_group_ids)
         ).order_by(Expense.date.desc()).all()
         
         transactions = []
         for expense in expenses:
-            # Find user's share
+            # Find user's share - user only sees expenses they're part of
             user_split = ExpenseSplit.query.filter_by(
                 expense_id=expense.id,
                 user_id=user.id
             ).first()
             
-            paid_by_user = User.query.get(expense.paid_by)
-            is_owed = expense.paid_by != user.id
-            
-            transactions.append({
-                'id': expense.id,
-                'icon': get_icon(expense.title),
-                'title': expense.title,
-                'paidBy': paid_by_user.name if paid_by_user else 'Unknown',
-                'amount': f'${expense.amount:.2f}',
-                'owedAmount': f'${user_split.amount:.2f}' if user_split else '$0.00',
-                'isOwed': is_owed,
-                'date': expense.date.isoformat() if expense.date else '',
-            })
+            # Only include if user has a split in this expense
+            if user_split:
+                paid_by_user = User.query.get(expense.paid_by)
+                is_owed = expense.paid_by != user.id
+                
+                transactions.append({
+                    'id': expense.id,
+                    'icon': get_icon(expense.title),
+                    'title': expense.title,
+                    'paidBy': paid_by_user.name if paid_by_user else 'Unknown',
+                    'amount': f'${expense.amount:.2f}',
+                    'owedAmount': f'${user_split.amount:.2f}',
+                    'isOwed': is_owed,
+                    'date': expense.date.isoformat() if expense.date else '',
+                })
         
         return {'transactions': transactions}, 200
     except Exception as e:

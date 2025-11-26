@@ -41,14 +41,22 @@ def get_groups():
                 Expense.group_id == group.id
             ).join(Expense).all()
             
+            # Get total amount user paid in this group
+            user_paid = sum(expense.amount for expense in Expense.query.filter_by(paid_by=user.id, group_id=group.id).all())
+            
             group_amount = sum(split.amount for split in user_splits)
-            total_balance += group_amount
+            # Net amount: if user paid more than they owe, it's positive (owed to them)
+            # if user owes more than they paid, it's negative (they owe)
+            net_amount = user_paid - group_amount
+            
+            total_balance += net_amount
             
             groups_list.append({
                 'id': group.id,
                 'name': group.name,
-                'amount': f'${group_amount:.2f}',
+                'amount': f'${abs(net_amount):.2f}',
                 'color': gradients[idx % len(gradients)],
+                'isOwed': net_amount >= 0,  # True if others owe you, False if you owe them
                 'members': [
                     {'id': m.id, 'username': m.username, 'name': m.name}
                     for m in group.members
@@ -141,6 +149,44 @@ def add_members_to_group(group_id):
                     for m in group.members
                 ]
             }
+        }, 200
+    except Exception as e:
+        db.session.rollback()
+        return handle_error(str(e), 500)
+
+@groups_bp.route('/groups/<group_id>', methods=['DELETE'])
+def delete_group(group_id):
+    """Delete a group (any member can delete)"""
+    try:
+        user = get_current_user()
+        if not user:
+            return {'error': 'Not authenticated'}, 401
+        
+        group = Group.query.get(group_id)
+        if not group:
+            return handle_error('Group not found', 404)
+        
+        # Check if user is in the group
+        if user not in group.members:
+            return handle_error('You are not a member of this group', 403)
+        
+        # Delete all expenses associated with this group
+        expenses = Expense.query.filter_by(group_id=group_id).all()
+        for expense in expenses:
+            # Delete splits first
+            ExpenseSplit.query.filter_by(expense_id=expense.id).delete()
+            db.session.delete(expense)
+        
+        # Remove all members from group
+        group.members.clear()
+        
+        # Delete the group
+        db.session.delete(group)
+        db.session.commit()
+        
+        return {
+            'success': True,
+            'message': 'Group deleted successfully'
         }, 200
     except Exception as e:
         db.session.rollback()

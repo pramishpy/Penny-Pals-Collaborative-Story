@@ -56,6 +56,17 @@ export default function Groups() {
     setIsAddMembersModalOpen(true);
   };
 
+  const handleDeleteGroup = async (groupId: string, groupName: string) => {
+    if (window.confirm(`Are you sure you want to delete "${groupName}"? This will also delete all expenses in this group.`)) {
+      try {
+        await api.deleteGroup(groupId);
+        fetchGroups();
+      } catch (error) {
+        console.error('Failed to delete group:', error);
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Header title="Groups" />
@@ -73,36 +84,54 @@ export default function Groups() {
             <p className="mt-4 text-gray-600">Loading your groups...</p>
           </div>
         ) : groups.length > 0 ? (
-          <div className="space-y-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {groups.map((group) => (
-              <div key={group.id} className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900">{group.name}</h3>
-                    <p className="text-2xl font-bold text-blue-600 mt-2">{group.amount}</p>
-                  </div>
-                  <button
-                    onClick={() => openAddMembersModal(group)}
-                    className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 font-medium text-sm"
-                  >
-                    + Add Members
-                  </button>
+              <div
+                key={group.id}
+                className="rounded-2xl p-6 text-white hover:shadow-lg transition transform hover:scale-105 min-h-[200px] flex flex-col justify-between relative"
+                style={{ background: group.color }}
+              >
+                {/* Delete button - top right */}
+                <button
+                  onClick={() => handleDeleteGroup(group.id, group.name)}
+                  className="absolute top-4 right-4 text-white hover:opacity-70 transition text-xl"
+                  title="Delete group"
+                >
+                  ✕
+                </button>
+
+                {/* Add Members button - top left with plus icon */}
+                <button
+                  onClick={() => openAddMembersModal(group)}
+                  className="absolute top-4 left-4 text-white hover:opacity-70 transition text-2xl font-light"
+                  title="Add members"
+                >
+                  +
+                </button>
+
+                <div className="pt-6">
+                  <h3 className="text-2xl font-bold">{group.name}</h3>
                 </div>
 
-                <div className="mb-4">
-                  <p className="text-sm font-semibold text-gray-700 mb-2">Members:</p>
-                  <div className="flex flex-wrap gap-2">
+                <div>
+                  <p className={`text-3xl font-bold ${group.isOwed ? 'text-green-300' : 'text-red-400'}`}>
+                    {group.amount}
+                  </p>
+                </div>
+
+                {/* Members display at bottom */}
+                <div className="text-xs text-white text-opacity-75">
+                  <p className="mb-1">Members: {group.members?.length || 0}</p>
+                  <div className="flex flex-wrap gap-1">
                     {group.members && group.members.length > 0 ? (
-                      group.members.map((member) => (
-                        <span
-                          key={member.id}
-                          className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
-                        >
-                          {member.name}
+                      group.members.slice(0, 3).map((member) => (
+                        <span key={member.id} className="bg-white bg-opacity-20 px-2 py-1 rounded">
+                          {member.name.split(' ')[0]}
                         </span>
                       ))
-                    ) : (
-                      <span className="text-gray-500 text-sm">No members yet</span>
+                    ) : null}
+                    {group.members && group.members.length > 3 && (
+                      <span className="bg-white bg-opacity-20 px-2 py-1 rounded">+{group.members.length - 3}</span>
                     )}
                   </div>
                 </div>
@@ -110,7 +139,7 @@ export default function Groups() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 bg-gray-100 rounded-2xl mb-8">
+          <div className="text-center py-12 bg-gray-100 rounded-2xl mb-12">
             <p className="text-gray-600 text-lg mb-4">No groups yet</p>
             <p className="text-gray-500">Create your first group to get started!</p>
           </div>

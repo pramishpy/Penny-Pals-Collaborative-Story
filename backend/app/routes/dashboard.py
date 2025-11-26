@@ -43,14 +43,22 @@ def get_dashboard():
                 Expense.group_id == group.id
             ).join(Expense).all()
             
+            # Get total amount user paid in this group
+            user_paid = sum(expense.amount for expense in Expense.query.filter_by(paid_by=user.id, group_id=group.id).all())
+            
             group_amount = sum(split.amount for split in user_splits)
-            total_owed += group_amount
+            # Net amount: if user paid more than they owe, it's positive (owed to them)
+            # if user owes more than they paid, it's negative (they owe)
+            net_amount = user_paid - group_amount
+            
+            total_owed += net_amount
             
             groups_summary.append({
                 'id': group.id,
                 'name': group.name,
-                'amount': f'${group_amount:.2f}',
+                'amount': f'${abs(net_amount):.2f}',
                 'color': gradients[idx % len(gradients)],
+                'isOwed': net_amount >= 0,  # True if others owe you, False if you owe them
                 'members': [
                     {'id': m.id, 'username': m.username, 'name': m.name}
                     for m in group.members

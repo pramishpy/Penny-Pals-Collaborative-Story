@@ -36,6 +36,17 @@ export default function Dashboard() {
     fetchDashboard();
   };
 
+  const handleDeleteGroup = async (groupId: string, groupName: string) => {
+    if (window.confirm(`Are you sure you want to delete "${groupName}"? This will also delete all expenses in this group.`)) {
+      try {
+        await api.deleteGroup(groupId);
+        fetchDashboard();
+      } catch (error) {
+        console.error('Failed to delete group:', error);
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Header title="Dashboard" />
@@ -53,16 +64,36 @@ export default function Dashboard() {
             <p className="mt-4 text-gray-600">Loading your groups...</p>
           </div>
         ) : groups.length > 0 ? (
-          <div className="grid grid-cols-4 gap-6">
-            {groups.map((group) => (
-              <GroupCard
-                key={group.id}
-                title={group.name || group.title}
-                amount={group.amount}
-                color={group.color}
-              />
-            ))}
-          </div>
+          <Card title="Your Groups">
+            <div className="space-y-3">
+              {groups.map((group) => (
+                <div key={group.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                  <div className="flex items-center gap-4 flex-1">
+                    <div
+                      className="w-4 h-4 rounded-full"
+                      style={{ background: group.color }}
+                    ></div>
+                    <div>
+                      <h4 className="font-semibold text-gray-900">{group.name}</h4>
+                      {group.members && group.members.length > 0 && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          {group.members.map(m => m.name).join(', ')}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className={`font-bold ${group.isOwed ? 'text-green-500' : 'text-red-500'}`}>
+                      {group.amount}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {group.isOwed ? 'owed to you' : 'you owe'}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
         ) : (
           <div className="text-center py-12 bg-gray-100 rounded-2xl">
             <p className="text-gray-600 text-lg mb-4">No groups yet</p>
