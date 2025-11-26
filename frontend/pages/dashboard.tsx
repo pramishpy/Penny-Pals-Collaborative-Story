@@ -48,45 +48,45 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <Header title="Dashboard" />
 
       <main className="flex-1 container-main py-8">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-4">
+          <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
             Overall, You are owed <span className="text-primary">{balance}</span>
           </h2>
         </div>
 
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="mt-4 text-gray-600">Loading your groups...</p>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">Loading your groups...</p>
           </div>
         ) : groups.length > 0 ? (
           <Card title="Your Groups">
             <div className="space-y-3">
               {groups.map((group) => (
-                <div key={group.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                <div key={group.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                   <div className="flex items-center gap-4 flex-1">
                     <div
                       className="w-4 h-4 rounded-full"
                       style={{ background: group.color }}
                     ></div>
                     <div>
-                      <h4 className="font-semibold text-gray-900">{group.name}</h4>
+                      <h4 className="font-semibold text-gray-900 dark:text-white">{group.name}</h4>
                       {group.members && group.members.length > 0 && (
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                           {group.members.map(m => m.name).join(', ')}
                         </p>
                       )}
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className={`font-bold ${group.isOwed ? 'text-green-500' : 'text-red-500'}`}>
+                    <p className={`font-bold ${group.isOwed ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
                       {group.amount}
                     </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                       {group.isOwed ? 'owed to you' : 'you owe'}
                     </p>
                   </div>
@@ -95,9 +95,9 @@ export default function Dashboard() {
             </div>
           </Card>
         ) : (
-          <div className="text-center py-12 bg-gray-100 rounded-2xl">
-            <p className="text-gray-600 text-lg mb-4">No groups yet</p>
-            <p className="text-gray-500">Create your first group to get started!</p>
+          <div className="text-center py-12 bg-gray-100 dark:bg-gray-800 rounded-2xl">
+            <p className="text-gray-600 dark:text-gray-300 text-lg mb-4">No groups yet</p>
+            <p className="text-gray-500 dark:text-gray-400">Create your first group to get started!</p>
           </div>
         )}
 
