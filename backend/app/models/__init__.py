@@ -19,6 +19,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(120), nullable=False)
+    currency = db.Column(db.String(10), default='USD')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     expenses = db.relationship('Expense', backref='user', lazy=True)

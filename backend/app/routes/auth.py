@@ -18,6 +18,7 @@ def register():
         email = data.get('email', '').strip()
         password = data.get('password', '').strip()
         name = data.get('name', '').strip()
+        currency = data.get('currency', 'USD').strip()
         
         # Validate fields
         if not username or len(username) < 3:
@@ -43,7 +44,8 @@ def register():
             id=generate_id(),
             username=username,
             email=email,
-            name=name
+            name=name,
+            currency=currency
         )
         new_user.set_password(password)
         
@@ -60,7 +62,8 @@ def register():
                 'id': new_user.id,
                 'username': new_user.username,
                 'email': new_user.email,
-                'name': new_user.name
+                'name': new_user.name,
+                'currency': new_user.currency
             }
         }, 201
         

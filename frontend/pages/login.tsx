@@ -177,6 +177,26 @@ export default function Login() {
                     className="input-field"
                   />
                 </div>
+
+                <div>
+                  <label htmlFor="currency" className="block text-sm font-medium text-foreground mb-1">
+                    Currency
+                  </label>
+                  <select
+                    id="currency"
+                    name="currency"
+                    value={formData.currency}
+                    onChange={handleChange as any}
+                    disabled={loading}
+                    className="input-field"
+                  >
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="GBP">GBP (£)</option>
+                    <option value="JPY">JPY (¥)</option>
+                    <option value="INR">INR (₹)</option>
+                  </select>
+                </div>
               </>
             )}
 

@@ -203,6 +203,46 @@ def pay_user():
         sender_wallet.balance -= amount
         recipient_wallet.balance += amount
         
+        # Create an offsetting expense to settle debts
+        # When User A pays User B, it's like User A created an expense "Payment to User B"
+        # paid by User A, and split 100% to User B.
+        # This means User A paid, and User B owes User A.
+        # Wait, if User A pays User B to SETTLE a debt, it means User B previously paid for User A.
+        # So User B has a positive balance with User A.
+        # If User A pays User B, we want to reduce the amount User A owes User B.
+        # In our system, "Amount User A owes User B" is calculated as:
+        # (Expenses paid by User B where User A is split) - (Expenses paid by User A where User B is split)
+        
+        # So to reduce debt, we need to increase (Expenses paid by User A where User B is split).
+        # So we create an expense paid by Sender (User A), split to Recipient (User B).
+        
+        payment_expense = Expense(
+            id=generate_id(),
+            title=f"Payment from {user.name}",
+            amount=amount,
+            paid_by=user.id,
+            group_id=None # Direct payment, not linked to a group
+        )
+        db.session.add(payment_expense)
+        
+        payment_split = ExpenseSplit(
+            id=generate_id(),
+            expense_id=payment_expense.id,
+            user_id=recipient.id,
+            amount=amount
+        )
+        db.session.add(payment_split)
+        
+        # Create notification for recipient
+        from app.models import Notification
+        notification = Notification(
+            id=generate_id(),
+            user_id=recipient.id,
+            message=f"{user.name} sent you ${amount:.2f}",
+            type='success'
+        )
+        db.session.add(notification)
+        
         db.session.commit()
         
         return {
