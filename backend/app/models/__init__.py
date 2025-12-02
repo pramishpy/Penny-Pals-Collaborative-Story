@@ -1,0 +1,132 @@
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+
+db = SQLAlchemy()
+
+def calculate_user_balance(user_id):
+    """Calculate user's net balance from all expenses - single source of truth
+    
+    Returns:
+        tuple: (total_balance, owed_to_user, user_owes_others)
+    """
+    from app.models import Expense, ExpenseSplit
+    
+    # Get all expenses user paid
+    expenses_paid = Expense.query.filter_by(paid_by=user_id).all()
+    total_paid = sum(exp.amount for exp in expenses_paid)
+    
+    # Get all splits for this user
+    all_splits = ExpenseSplit.query.filter_by(user_id=user_id).all()
+    
+    # Calculate what user owes (splits where someone else paid)
+    user_owes_others = 0.0
+    # Calculate what others owe user (user's share in expenses they paid)
+    user_share_in_paid_expenses = 0.0
+    
+    for split in all_splits:
+        expense = Expense.query.get(split.expense_id)
+        if expense:
+            if expense.paid_by != user_id:
+                # Someone else paid, user owes them
+                user_owes_others += split.amount
+            else:
+                # User paid, this is their share
+                user_share_in_paid_expenses += split.amount
+    
+    # What others owe the user = what user paid minus their own share
+    owed_to_user = total_paid - user_share_in_paid_expenses
+    
+    # Net balance = what others owe you - what you owe others
+    total_balance = owed_to_user - user_owes_others
+    
+    return (total_balance, owed_to_user, user_owes_others)
+
+# Many-to-many association table
+group_members = db.Table('group_members',
+    db.Column('user_id', db.String(36), db.ForeignKey('users.id'), primary_key=True),
+    db.Column('group_id', db.String(36), db.ForeignKey('groups.id'), primary_key=True),
+    extend_existing=True
+)
+
+class User(db.Model):
+    __tablename__ = 'users'
+    __table_args__ = {'extend_existing': True}
+    
+    id = db.Column(db.String(36), primary_key=True)
+    username = db.Column(db.String(120), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(120), nullable=False)
+    currency = db.Column(db.String(10), default='USD')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    expenses = db.relationship('Expense', backref='user', lazy=True)
+    groups = db.relationship('Group', secondary=group_members, backref='members')
+    
+    def set_password(self, password):
+        """Hash and set password"""
+        from werkzeug.security import generate_password_hash
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        """Check if provided password matches hash"""
+        from werkzeug.security import check_password_hash
+        return check_password_hash(self.password_hash, password)
+
+class Group(db.Model):
+    __tablename__ = 'groups'
+    __table_args__ = {'extend_existing': True}
+    
+    id = db.Column(db.String(36), primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    expenses = db.relationship('Expense', backref='group', lazy=True, cascade='all, delete-orphan')
+
+class Expense(db.Model):
+    __tablename__ = 'expenses'
+    __table_args__ = {'extend_existing': True}
+    
+    id = db.Column(db.String(36), primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    paid_by = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    group_id = db.Column(db.String(36), db.ForeignKey('groups.id'), nullable=True)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    splits = db.relationship('ExpenseSplit', backref='expense', lazy=True, cascade='all, delete-orphan')
+
+class ExpenseSplit(db.Model):
+    __tablename__ = 'expense_splits'
+    __table_args__ = {'extend_existing': True}
+    
+    id = db.Column(db.String(36), primary_key=True)
+    expense_id = db.Column(db.String(36), db.ForeignKey('expenses.id'), nullable=False)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    
+    user = db.relationship('User', backref='splits')
+
+class Notification(db.Model):
+    __tablename__ = 'notifications'
+    __table_args__ = {'extend_existing': True}
+    
+    id = db.Column(db.String(36), primary_key=True)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    message = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    read = db.Column(db.Boolean, default=False)
+    type = db.Column(db.String(20), default='info') # info, success, warning, error
+
+class Wallet(db.Model):
+    __tablename__ = 'wallets'
+    __table_args__ = {'extend_existing': True}
+    
+    id = db.Column(db.String(36), primary_key=True)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    balance = db.Column(db.Float, default=0.0)
+    card_last_four = db.Column(db.String(4), default='1234')
+    bank_account = db.Column(db.String(20), nullable=True)
+    
+    user = db.relationship('User', backref=db.backref('wallet', uselist=False))
