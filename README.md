@@ -86,3 +86,4 @@ The project uses SQLAlchemy with SQLite. The database file is located at `backen
 
 - **Port Conflicts**: Ensure ports 3000 and 5000 are free.
 - **Database Issues**: If you encounter schema errors, you can delete `backend/app.db` and restart the backend to recreate it fresh (warning: this deletes all data).
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHjGfPtwzTeJhQd4ZprXs0R+enNop/vGi6oL3R/eCghR ec2-user@ip-172-31-77-136.ec2.internal
